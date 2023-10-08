@@ -3,6 +3,7 @@ package znet
 import (
 	"fmt"
 	"net"
+	"zinx/ziface"
 )
 
 type Server struct {
@@ -57,4 +58,25 @@ func (s *Server) Start() {
 			}()
 		}
 	}()
+}
+
+func (s *Server) Stop() {
+	fmt.Println("[STOP] Zinx server, name", s.Name)
+}
+
+func (s *Server) Serve() {
+	s.Start()
+
+	select {}
+}
+
+func NewServer(name string) ziface.IServer {
+	s := &Server{
+		Name:      name,
+		IPVersion: "tcp4",
+		IP:        "0.0.0.0",
+		Port:      7777,
+	}
+
+	return s
 }
