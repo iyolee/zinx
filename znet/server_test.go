@@ -5,7 +5,33 @@ import (
 	"net"
 	"testing"
 	"time"
+	"zinx/ziface"
 )
+
+type PingRouter struct {
+	BaseRouter
+}
+
+func (this *PingRouter) PreHandle(request ziface.IRequest) {
+	_, err := request.GetConnection().GetTCPConnection().Write([]byte("before ping"))
+	if err != nil {
+		fmt.Println("ping error: ", err)
+	}
+}
+
+func (this *PingRouter) Handle(request ziface.IRequest) {
+	_, err := request.GetConnection().GetTCPConnection().Write([]byte("ping...ping..."))
+	if err != nil {
+		fmt.Println("ping error: ", err)
+	}
+}
+
+func (this *PingRouter) PostHandle(request ziface.IRequest) {
+	_, err := request.GetConnection().GetTCPConnection().Write([]byte("after ping"))
+	if err != nil {
+		fmt.Println("ping error: ", err)
+	}
+}
 
 func ClientTest() {
 	fmt.Println("Client Test ...start")
@@ -38,7 +64,7 @@ func ClientTest() {
 
 func TestServer(t *testing.T) {
 	s := NewServer("zinx v0.1")
-
+	s.AddRouter(&PingRouter{})
 	go ClientTest()
 	s.Serve()
 }
